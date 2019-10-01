@@ -1,0 +1,159 @@
+Dim Browser As Object
+
+Sub SAPAuto()
+
+Dim i As Integer
+Dim x, y, z As String
+Dim row As Long, col As Long
+    
+row = 1
+col = 1
+
+'    Dim BodyReport As Object
+'    Dim BodyReportItem As Object
+
+'Dim Button As Object
+'Dim ButtonSelect As Object
+Sheet5.Visible = True
+
+For i = 1 To Sheet1.Range("F3")
+
+    x = Sheet1.ListObjects("AWB_List").Range.Cells(i + 1, 1).Value
+    
+    If x = "" Then
+         i = i + 1
+         'Exit For
+            
+    End If
+        
+    Sheet5.Cells(i + 1, 1).Value = x
+    
+        
+    Set Browser = CreateObject("InternetExplorer.Application")
+
+    Dim BrowserId As Object
+    Dim html As HTMLDocument
+    Dim arr
+    
+    Browser.Visible = True
+    
+   'Sheet1.Range("F10").Value = "https://www.sap-express.id/layanan/tracking/details/" & x
+    
+navigate:
+    Browser.navigate ("https://www.sap-express.id/layanan/tracking/details/" & x)
+    
+    Do While Browser.readyState <> 4: DoEvents: Loop
+
+    wait
+    
+    Set html = Browser.document
+    
+    'If BrowserId Is Nothing Then GoTo navigate
+    
+    'arr = Split(html.DocumentElement.outerHTML, vbLf)
+    
+    'Worksheets("Sheet5").Range("A1").Resize(UBound(arr) + 1, 1).Value = arr
+    
+    Worksheets("Sheet5").Select
+    Sheet5.Cells(i + 1, 2).Value = html.DocumentElement.innerText
+
+    
+    Browser.Quit
+    
+Next i
+
+MsgBox "Fetching Data Has Been Done!"
+
+End Sub
+
+Sub wait()
+    Application.wait Now + TimeSerial(0, 0, 10)
+    Do While Browser.readyState <> 4: DoEvents: Loop
+End Sub
+
+
+Sub SAPAutoHTTP()
+
+Dim i As Integer
+Dim x, y, z As String
+Dim row As Long, col As Long
+    
+row = 1
+col = 1
+
+
+For i = 1 To 1
+    x = Sheet1.ListObjects("AWB_List").Range.Cells(i + 1, 1).Value
+        
+    Dim xmlHttp As Object
+    Dim TR As Object
+    Dim TD_col As Object, TD As Object
+    Dim tbl1 As Object
+
+    Set xmlHttp = CreateObject("MSXML2.XMLHTTP.6.0")
+    
+    xmlHttp.Open "GET", "https://www.sap-express.id/layanan/tracking/track/" & x, False
+    xmlHttp.setRequestHeader "Content-Type", "text/xml"
+    xmlHttp.send
+    
+    Dim html As Object
+    Set html = CreateObject("htmlfile")
+    html.body.innerHTML = xmlHttp.responseText
+    
+    Dim tbl As Object
+    Set tbl = html.getElementsByTagName("tbody")
+    'Set tbl1 = tbl.getElementsByTagName
+    
+      
+    'For Each TR In tbl1
+        'Set TD_col = TR_col.getElementsByTagName("td")
+        'For Each TD In TD_col
+         '   Sheet5.Cells(row, col) = TD.innerText
+          '  col = col + 1
+        'Next
+        
+     '   Sheet5.Cells(row, col) = TR.innerText
+        
+      '  row = row + 1
+   ' Next
+    
+    'col = col + 1
+Next i
+
+
+End Sub
+
+
+Sub Bikin_Tabel_AWB()
+
+Dim i As Integer
+Dim x As Integer
+
+
+For i = 2 To Sheet1.Range("F3")
+    Sheet1.ListObjects("AWB_List").ListRows.Add AlwaysInsert:=True
+
+Next i
+
+MsgBox "Form AWB Table has been done!"
+
+End Sub
+
+
+Sub ClearDataSheet()
+
+Dim i As Integer
+
+Sheet5.Visible = True
+
+
+For i = 1 To 400
+
+Sheet5.Cells(i + 1, 1).Value = ""
+Sheet5.Cells(i + 1, 2).Value = ""
+
+Next i
+
+MsgBox "Clear Data Has Been Done!"
+
+End Sub
